@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Портфолио | Миродил Камолов</title>
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    rel="stylesheet"
+  />
+  <style>
+    /* Reset */
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body, html { height: 100%; }
+    body {
+      background: url('https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=1470&q=80') no-repeat center center fixed;
+      background-size: cover;
+      color: #222;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      overflow: hidden;
+    }
+
+    #login-form, #site-content {
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 12px;
+      max-width: 700px;
+      width: 100%;
+      padding: 40px 50px;
+      box-sizing: border-box;
+      animation: fadeIn 0.5s ease forwards;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1.5px solid rgba(255, 255, 255, 0.7);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      position: relative;
+      z-index: 10;
+    }
+
+    #site-content { display: none; max-height: 90vh; overflow-y: auto; }
+    @keyframes fadeIn { from {opacity:0; transform:translateY(20px);} to {opacity:1; transform:translateY(0);} }
+
+    /* Login */
+    #login-form h2 { text-align:center; margin-bottom:30px; color:#0d0d4a; font-size:2rem; letter-spacing:1.5px; }
+    #login-form input { display:block; width:100%; padding:14px 18px; margin-bottom:18px; border:2px solid #0d0d4a; border-radius:8px; font-size:1.1rem; background:rgba(255,255,255,0.9);}
+    #login-form input:focus { border-color:#4a4aff; box-shadow:0 0 8px #4a4aff; outline:none; }
+    #login-form button { width:100%; background:#4a4aff; color:#fff; padding:12px; border-radius:8px; font-weight:700; cursor:pointer; border:none; }
+    #login-form button:hover{ background:#000dff; }
+    #error { text-align:center; color:#d62828; margin-top:6px; min-height:22px; font-weight:600; }
+
+    /* Content */
+    header { text-align:center; margin-bottom:35px; }
+    header h1 { font-size:3rem; color:#0d0d4a; margin-bottom:8px; font-weight:900; }
+    header p { font-size:1.1rem; color:#555; font-style:italic; font-weight:600; }
+    section { margin-bottom:30px; }
+    section h2 { font-size:1.8rem; color:#0d0d4a; border-bottom:3px solid #4a4aff; padding-bottom:8px; margin-bottom:18px; font-weight:700; }
+    ul { list-style:disc; padding-left:25px; font-size:1.05rem; color:#333; font-weight:600; }
+    .project { background:#f4f6ff; padding:16px 18px; border-radius:10px; margin-bottom:14px; box-shadow:0 4px 12px rgba(13,13,74,0.09); }
+    .project h3 { font-size:1.2rem; color:#1a237e; margin-bottom:8px; display:flex; gap:10px; align-items:center; font-weight:700; }
+    .project a { color:#4a4aff; text-decoration:none; font-weight:700; }
+    .project a:hover { text-decoration:underline; color:#000dff; }
+    #contact p { font-size:1.02rem; color:#222; margin-bottom:10px; display:flex; gap:10px; align-items:center; font-weight:600; }
+    footer { text-align:center; padding-top:14px; color:#666; border-top:1px solid #eee; }
+
+    /* Request button - top right, responsive */
+    #request-btn {
+      position: fixed;
+      top: 18px;
+      right: 18px;
+      z-index: 60;
+      background: linear-gradient(180deg,#5a5cff,#3a3aff);
+      color:#fff;
+      border:none;
+      padding:8px 12px;
+      border-radius:999px;
+      font-weight:700;
+      display:none; /* покажем после логина */
+      cursor:pointer;
+      box-shadow:0 6px 18px rgba(13,13,74,0.18);
+      display:flex; align-items:center; gap:8px;
+    }
+    #request-btn .btn-text { display:inline-block; }
+    @media (max-width:768px) { #request-btn { top:64px; right:12px; padding:8px; } #request-btn .btn-text{ display:none; } }
+
+    /* Modal */
+    .modal { display:none; position:fixed; inset:0; z-index:120; background:rgba(0,0,0,0.45); justify-content:center; align-items:center; padding:20px; }
+    .modal[aria-hidden="false"] { display:flex; }
+    .modal-content { background:#fff; border-radius:12px; width:100%; max-width:420px; padding:22px; position:relative; box-shadow:0 12px 30px rgba(0,0,0,0.18); }
+    .modal-content h2 { margin-bottom:12px; color:#0d0d4a; font-size:1.2rem; }
+    .modal-content input { width:100%; margin-bottom:12px; padding:10px 12px; border-radius:8px; border:1.4px solid #d3d3d3; font-size:1rem; }
+    .modal-actions { display:flex; gap:10px; margin-top:6px; }
+    .modal-actions button { flex:1; padding:10px 12px; border-radius:8px; border:none; font-weight:700; cursor:pointer; }
+    .modal-actions .send { background:#4a4aff; color:#fff; }
+    .modal-actions .cancel { background:#e9eefc; color:#0d0d4a; border:1px solid #dfe8ff; }
+    #close-modal { position:absolute; top:12px; right:12px; font-size:1.25rem; cursor:pointer; color:#666; }
+    #req-success { margin-top:8px; font-weight:700; min-height:20px; }
+
+    @media (max-width:600px) {
+      #login-form, #site-content { padding:22px; }
+      header h1 { font-size:1.9rem; }
+      section h2 { font-size:1.4rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Форма входа -->
+  <div id="login-form" role="main" aria-label="Форма входа">
+    <h2><i class="fas fa-lock"></i> Вход</h2>
+    <input type="text" id="username" placeholder="Логин" autocomplete="off" aria-label="Логин" autofocus />
+    <input type="password" id="password" placeholder="Пароль" autocomplete="off" aria-label="Пароль" />
+    <button id="login-btn" aria-label="Войти">Войти</button>
+    <p id="error" aria-live="assertive"></p>
+  </div>
+
+  <!-- Контент сайта -->
+  <div id="site-content" tabindex="-1" aria-hidden="true">
+    <header>
+      <h1>Миродил Камолов</h1>
+      <p>Backend-разработчик и аналитик данных</p>
+    </header>
+
+    <section id="about">
+      <h2>👨‍💻 Обо мне</h2>
+      <p>Привет! Я начинающий разработчик и аналитик. Изучаю Python и базы данных. Люблю автоматизировать скучные задачи и создавать полезные проекты.</p>
+    </section>
+
+    <section id="skills">
+      <h2>🛠️ Навыки</h2>
+      <ul>
+        <li>Python (Flask, Django)</li>
+        <li>SQL (PostgreSQL)</li>
+        <li>Создание Telegram ботов</li>
+        <li>Аналитика данных</li>
+      </ul>
+    </section>
+
+    <section id="projects">
+      <h2>📘 Учёба</h2>
+      <div class="project">
+        <h3><i class="fas fa-file-alt"></i> Английский</h3>
+        <p>Сейчас активно готовлюсь к IELTS.</p>
+        <a href="" target="_blank" rel="noopener noreferrer">🔗 Multilevel</a>
+      </div>
+      <div class="project">
+        <h3><i class="fas fa-calculator"></i> Математика</h3>
+        <p>Проходил подготовительный курс в университете ИНХА, успешно поступил и продолжаю развиваться.</p>
+        <a href="" target="_blank" rel="noopener noreferrer">🔗 INHA</a>
+      </div>
+      <div class="project">
+        <h3><i class="fas fa-code"></i> IT</h3>
+        <p>Учился в академии USTUDY, получил сертификат по аналитике данных. Мне очень нравится разработка и аналитика.</p>
+        <a href="https://online.ustudy.uz/confirm-certificate?id=894c3982-001f-4cb9-2e67-08ddebae316e" target="_blank" rel="noopener noreferrer">🔗 CERTIFICATE</a>
+      </div>
+    </section>
+
+    <section id="contact">
+      <h2>📬 Контакты</h2>
+      <p><i class="fas fa-envelope"></i> Email: <a href="mailto:kamolovkamron34@gmail.com">kamolovmirodil333@gmail.com</a></p>
+      <p><i class="fab fa-instagram"></i> Instagram: <a href="https://www.instagram.com/mirodil_kmlv" target="_blank" rel="noopener noreferrer">mirodil_kmlv</a></p>
+      <p><i class="fab fa-telegram"></i> Telegram: <a href="https://t.me/no1nformation" target="_blank" rel="noopener noreferrer">@no1nformation</a></p>
+    </section>
+
+    <footer><p>© 2025 Миродил Камолов</p></footer>
+  </div>
+
+  <!-- Кнопка заявки (правый верх) -->
+  <button id="request-btn" aria-label="Оставить заявку" aria-haspopup="dialog">
+    <span class="btn-icon">📝</span>
+    <span class="btn-text">Оставить заявку</span>
+  </button>
+
+  <!-- Модалка заявки -->
+  <div id="request-modal" class="modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="request-title">
+    <div class="modal-content" role="document">
+      <button id="close-modal" aria-label="Закрыть">&times;</button>
+      <h2 id="request-title">Оставить заявку</h2>
+
+      <label for="req-name" style="display:none">Ваше имя</label>
+      <input type="text" id="req-name" placeholder="Ваше имя" autocomplete="name" />
+
+      <label for="req-phone" style="display:none">Ваш телефон</label>
+      <input type="tel" id="req-phone" placeholder="Номер телефона (+998...) " inputmode="tel" />
+
+      <div class="modal-actions">
+        <button class="send" id="send-request">Отправить</button>
+        <button class="cancel" id="cancel-request">Отмена</button>
+      </div>
+
+      <p id="req-success" aria-live="polite"></p>
+    </div>
+  </div>
+
+  <script>
+    /***** Настройки: вставь сюда свои данные (не коммить!) *****/
+    const BOT_TOKEN = "7969228938:AAE5j8_R6ly6uIFnCDLRhnP02iODDUgoyn4"; // пример: "123456789:ABCdefGhI..."
+    const CHAT_ID   = "1210816092";   // пример: "987654321" или "-1001234567890"
+
+    /***** Элементы страницы *****/
+    const loginBtn = document.getElementById('login-btn');
+    const errorEl = document.getElementById('error');
+    const siteContent = document.getElementById('site-content');
+    const loginForm = document.getElementById('login-form');
+    const requestBtn = document.getElementById('request-btn');
+    const modal = document.getElementById('request-modal');
+    const closeModal = document.getElementById('close-modal');
+    const cancelRequest = document.getElementById('cancel-request');
+    const sendBtn = document.getElementById('send-request');
+    const successMsg = document.getElementById('req-success');
+    const reqName = document.getElementById('req-name');
+    const reqPhone = document.getElementById('req-phone');
+
+    const VALID_USER = { username: 'mirodil', password: '1234' };
+
+    function showRequestButton(show = true) { requestBtn.style.display = show ? 'flex' : 'none'; }
+    function setContentVisible(visible) {
+      siteContent.style.display = visible ? 'block' : 'none';
+      siteContent.setAttribute('aria-hidden', visible ? 'false' : 'true');
+      loginForm.style.display = visible ? 'none' : 'block';
+    }
+
+    function login() {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+      errorEl.textContent = '';
+      if (username === VALID_USER.username && password === VALID_USER.password) {
+        setContentVisible(true);
+        showRequestButton(true);
+        siteContent.focus();
+      } else {
+        errorEl.textContent = 'Неверный логин или пароль';
+      }
+    }
+
+    // Enter на password
+    document.getElementById('password').addEventListener('keydown', (e) => { if (e.key === 'Enter') login(); });
+    loginBtn.addEventListener('click', login);
+
+    /***** Модалка: открытие / закрытие / доступность *****/
+    function openModal() {
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      setTimeout(() => reqName.focus(), 50);
+    }
+    function closeModalFn() {
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      successMsg.textContent = '';
+      reqName.value = '';
+      reqPhone.value = '';
+      requestBtn.focus();
+    }
+
+    requestBtn.addEventListener('click', openModal);
+    closeModal.addEventListener('click', closeModalFn);
+    cancelRequest.addEventListener('click', closeModalFn);
+
+    // клик в пустоту закрывает
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeModalFn(); });
+    window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.getAttribute('aria-hidden') === 'false') closeModalFn(); });
+
+    /***** Валидация телефона *****/
+    function validatePhone(phone) {
+      const digits = phone.replace(/\D/g, '');
+      return digits.length >= 5 && digits.length <= 20 && /^[+\d\s()-]+$/.test(phone);
+    }
+
+    /***** Отправка в Telegram (через API) *****/
+    async function sendToTelegram(name, phone) {
+      if (!BOT_TOKEN || !CHAT_ID || BOT_TOKEN.includes('ВАШ') || CHAT_ID.includes('ВАШ')) {
+        console.warn('BOT_TOKEN или CHAT_ID не установлены в коде.');
+        return { ok: false, error: 'NO_TOKEN' };
+      }
+      const text = `📩 Новая заявка:\n👤 Имя: ${name}\n📞 Телефон: ${phone}`;
+      const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(text)}`;
+      try {
+        const res = await fetch(url);
+        if (!res.ok) {
+          const body = await res.text();
+          console.error('Telegram API error:', res.status, body);
+          return { ok: false, status: res.status, body };
+        }
+        return { ok: true };
+      } catch (err) {
+        console.error('Fetch error:', err);
+        return { ok: false, error: err.message || err };
+      }
+    }
+
+    /***** Обработчик отправки: сохраняем localStorage и пробуем отправить в Telegram *****/
+    sendBtn.addEventListener('click', async () => {
+      const name = reqName.value.trim();
+      const phone = reqPhone.value.trim();
+
+      if (!name) {
+        successMsg.style.color = 'red'; successMsg.textContent = 'Введите имя'; reqName.focus(); return;
+      }
+      if (!phone || !validatePhone(phone)) {
+        successMsg.style.color = 'red'; successMsg.textContent = 'Введите корректный номер'; reqPhone.focus(); return;
+      }
+
+      // Сохраняем локально (можно потом просмотреть)
+      try {
+        const requests = JSON.parse(localStorage.getItem('requests') || '[]');
+        requests.push({ name, phone, date: new Date().toISOString() });
+        localStorage.setItem('requests', JSON.stringify(requests));
+      } catch (err) {
+        console.warn('Ошибка localStorage', err);
+      }
+
+      // Отправляем в Telegram
+      successMsg.style.color = 'black'; successMsg.textContent = 'Отправка...';
+      const res = await sendToTelegram(name, phone);
+
+      if (res.ok) {
+        successMsg.style.color = 'green';
+        successMsg.textContent = '✅ Заявка отправлена!';
+        setTimeout(() => closeModalFn(), 1000);
+      } else {
+        // Возможные причины: нет токена, неверные данные, CORS или блокировка
+        successMsg.style.color = 'red';
+        if (res.error === 'NO_TOKEN') {
+          successMsg.textContent = 'Токен/ID не установлен — вставь BOT_TOKEN и CHAT_ID в код.';
+        } else if (res.status) {
+          successMsg.textContent = `Ошибка Telegram API (${res.status}). Посмотри консоль.`;
+        } else {
+          successMsg.textContent = 'Ошибка отправки (проверь консоль). Возможно CORS — используй серверный прокси.';
+        }
+      }
+    });
+
+    /***** Утилита: показать сохранённые заявки в консоли (для проверки) *****/
+    // Открой консоль и вызови showSavedRequests(), чтобы увидеть заявки
+    function showSavedRequests() {
+      const requests = JSON.parse(localStorage.getItem('requests') || '[]');
+      console.table(requests);
+      return requests;
+    }
+    window.showSavedRequests = showSavedRequests;
+
+    /***** Примечания:
+        - Замените BOT_TOKEN и CHAT_ID перед тестом.
+        - Если Telegram не отвечает — открой DevTools → Network/Console и посмотри ошибку.
+        - Если видишь ошибку CORS, делай отправку через сервер (Netlify/Vercel function) и храните токен в переменных окружения.
+    *****/
+  </script>
+</body>
+</html>
